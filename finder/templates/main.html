@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск</title>
+    <link type="text/css" rel="stylesheet" href="static/css/main.css">
+</head>
+<body>
+    <h1>Поиск на страницах сайта "{{search_url}}"</h1>
+    <div class="main_content">
+        <form action="" method="post">
+            <p>
+                <label id="search_label" for="search">Введите слово для поиска:</label>
+                <br/>
+                <input type="text" name="search">
+            </p>
+            <p>
+                <input type="submit" value="Поиск">
+            </p>
+        </form>
+    </div>
+    {% if result %}
+    <div class="main_content">
+        <h3 style="margin: 10px;">Результаты поиска "{{query}}": (всего совпадений: {{count}})</h3>
+        {% for url in urls %}
+            <div id="match">
+                <div><a href={{url.path}} target="_blank">{{url.path}}</a></div>
+                <div id="url_body">{{url.body[:300]}}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    {% endif %}
+<footer>Разработал: Козяр В. Н.</footer>
+</body>
+</html>
