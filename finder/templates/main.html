@@ -15,7 +15,8 @@
                 <input type="text" name="search">
             </p>
             <p>
-                <input type="submit" value="Поиск">
+<!--                <input type="submit" value="Поиск">-->
+                <button id="button" type="submit" tabindex="0">Поиск</button>
             </p>
         </form>
     </div>
@@ -25,7 +26,7 @@
         {% for url in urls %}
             <div id="match">
                 <div><a href={{url.path}} target="_blank">{{url.path}}</a></div>
-                <div id="url_body">{{url.body[:300]}}</div>
+                <div id="url_body"><p>{{url.body_first}} <span id='word_match'>{{url.word}}</span> {{url.body_last}}</p></div>
             </div>
         {% endfor %}
     </div>

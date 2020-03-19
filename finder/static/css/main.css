@@ -1,3 +1,7 @@
+body {
+    font-family: Verdana,sans-serif;
+}
+
 h1 {
     text-align: center;
     font-size: 16px;
@@ -12,9 +16,7 @@ h1 {
     margin:10px auto;
 }
 
-#search_label {
-    font-weight: bolder;
-}
+
 
 #match {
     background-color: #fbfdff;
@@ -31,4 +33,22 @@ footer {
      text-align: right;
      text-size: 10px;
      color: #c0c0c0;
+}
+
+#word_match {
+    color: #F80000;
+    font-style: oblique;
+    font-size: 14px;
+    text-decoration: underline;
+    font-weight: 900;
+}
+
+#button {
+    background-color: #e7e7e7;
+    color: black;
+    border: none;
+    padding: 12px 28px;
+    text-align: center;
+    border-radius: 8px;
+
 }

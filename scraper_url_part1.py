@@ -10,7 +10,7 @@ import requests
 
 from config import URL, DB_config
 
-# all_links = dict()
+
 LINKS_IN_SESSION = []
 ALL_LINKS = []
 LOCK = Lock()
@@ -26,7 +26,7 @@ def save_to_db(conn, url: str, text: str):
     """
     # Запускаем в отдельном потоке, поэтому ставим мьютекс
     LOCK.acquire()
-    text = text.strip()
+    text = text.strip().replace('\'', '"')
     text = re.sub(r"\n+", r"\n", text)
     ins = "insert into url_to_topic values('{0}', '{1}', TIMESTAMP '{2}')".format(url, text,
                                                                                   str(datetime.datetime.today()))
@@ -38,7 +38,7 @@ def save_to_db(conn, url: str, text: str):
         ALL_LINKS.append(url)
     except Exception as err:
         logging.error(err)
-        # conn.rollback()
+        conn.rollback()
     finally:
         LOCK.release()
 
@@ -56,7 +56,7 @@ def get_all_link(conn, url: str):
     soup = BeautifulSoup(page.text, 'lxml')
     # Если страницу по этому url еще нет в БД, то записываем ее в БД
     if url not in ALL_LINKS:
-        thread = Thread(target=save_to_db, args=(conn, url, soup.get_text().replace('\'', '"')))
+        thread = Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text()))
         thread.setDaemon(True)
         thread.start()
     # Добавляем эту ссылку в пройденные в этой сессии
@@ -89,11 +89,11 @@ def main():
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
         ALL_LINKS = list(link[0] for link in links)
-        print(ALL_LINKS)
-        print(len(ALL_LINKS))
+        # print(ALL_LINKS)
+        # print(len(ALL_LINKS))
         get_all_link(conn, URL)
-        print(LINKS_IN_SESSION)
-        print(len(LINKS_IN_SESSION))
+        # print(LINKS_IN_SESSION)
+        # print(len(LINKS_IN_SESSION))
     except Exception as err:
         logging.error(err)
         # if conn is not None:
