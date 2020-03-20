@@ -19,5 +19,5 @@ def main_page():
     if query is None:
         return render_template("main.html", search_url=URL, result=False)
     else:
-        urls = FindInDB.get_topics(query)
+        urls = FindInDB.get_topics(query.lower())
         return render_template("main.html", search_url=URL, result=True, urls=urls, count=len(urls), query=query)

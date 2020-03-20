@@ -56,11 +56,8 @@ def main():
             print("{0} from {1} done! url: {2}".format(i, max_, url))
     except Exception as err:
         logging.error(err)
-        # if conn is not None:
-        #     conn.rollback()
     finally:
         if conn is not None:
-            # conn.commit()
             conn.close()
 
 

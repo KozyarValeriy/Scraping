@@ -5,7 +5,6 @@ body {
 h1 {
     text-align: center;
     font-size: 16px;
-
 }
 
 .main_content {
@@ -15,8 +14,6 @@ h1 {
     width: 1200px;
     margin:10px auto;
 }
-
-
 
 #match {
     background-color: #fbfdff;
@@ -49,6 +46,7 @@ footer {
     border: none;
     font-size: 16px;
     padding: 12px 28px 12px 24px;
+    margin: 0;
     text-align: center;
     border-radius: 0 10px 10px 0;
     -webkit-transition-duration: 0.4s;
@@ -69,8 +67,8 @@ footer {
     color: black;
     border: none;
     padding: 12px 12px;
-    margin: 0 0px 0 12px;
+    margin: 0 0px 0 14px;
     border-radius: 6px 0 0 6px;
-    width: 1045px;
+    width: 1040px;
     border: 2px solid white;
 }
