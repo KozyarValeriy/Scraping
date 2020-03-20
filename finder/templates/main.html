@@ -7,12 +7,18 @@
     <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <h1>Поиск на страницах сайта "{{search_url}}"</h1>
+    <h1>Поиск на страницах сайта "<a href={{search_url}} target="_blank">{{search_url}}</a>"</h1>
     <div class="main_content">
         <form action="" method="post">
             <p>
-                <input id="main_input" type="text" name="search" autocomplete="off" placeholder="Введите слово для поиска">
-                <button id="button" type="submit" tabindex="0">Поиск</button>
+                {% if query %}
+                    <input id="main_input" type="text" name="search" autocomplete="off"
+                       placeholder="Введите слово для поиска" value={{query}}>
+                {% else %}
+                    <input id="main_input" type="text" name="search" autocomplete="off"
+                        placeholder="Введите слово для поиска" value={{query}}>
+                {% endif %}
+                <button id="button_sub" type="submit" tabindex="0">Поиск</button>
             </p>
         </form>
     </div>

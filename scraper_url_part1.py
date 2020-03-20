@@ -66,10 +66,7 @@ def get_all_link(conn, url: str):
     # Если страницу по этому url еще нет в БД, то записываем ее в БД
     if url not in ALL_LINKS:
         ALL_THREAD.append(Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text())))
-        # thread = Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text()))
-        # thread.setDaemon(True)
         ALL_THREAD[-1].start()
-        # save_to_db(conn, url, soup.find('body').get_text())
     # Добавляем эту ссылку в пройденные в этой сессии
     LINKS_IN_SESSION.append(url)
     # Обходим все теги <a> на странице
@@ -82,8 +79,7 @@ def get_all_link(conn, url: str):
             # Для относительных ссылок добавляем в начало главный url
             text_link = text_link if text_link.startswith(URL) else "".join([URL, text_link])
             text_link = text_link.rstrip('/')
-            # if text_link not in LINKS_IN_SESSION:
-            # ызываем функцию для следующего url
+            # вызываем функцию для следующего url
             get_all_link(conn, text_link)
         except KeyError:
             pass
@@ -100,18 +96,11 @@ def main():
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
         ALL_LINKS = list(link[0] for link in links)
-        # print(ALL_LINKS)
-        # print(len(ALL_LINKS))
         get_all_link(conn, URL)
-        # print(LINKS_IN_SESSION)
-        # print(len(LINKS_IN_SESSION))
     except Exception as err:
         logging.error(err)
-        # if conn is not None:
-        #     conn.rollback()
     finally:
         if conn is not None:
-            # conn.commit()
             for thread in ALL_THREAD:
                 thread.join()
             conn.close()

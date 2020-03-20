@@ -5,3 +5,5 @@ test.py
 /config.py
 /task_2.log
 /task_3.log
+/task_2_with_queue.log
+/task_1_with_queue.log

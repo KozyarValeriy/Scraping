@@ -52,7 +52,6 @@ def main():
                 # thread.setDaemon(True)
                 # thread.start()
                 WORDS_IN_SESSION.append((word, url))
-                # print(word, url)
             print("{0} from {1} done! url: {2}".format(i, max_, url))
     except Exception as err:
         logging.error(err)

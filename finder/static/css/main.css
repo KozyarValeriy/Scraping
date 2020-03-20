@@ -7,14 +7,25 @@ h1 {
     font-size: 16px;
 }
 
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    color: red;
+}
+
+
 .main_content {
     padding: 10px;
     border-radius: 10px;
     background-color: #c0c0c0;
     width: 1200px;
-    margin:10px auto;
+    margin: 10px auto;
 }
 
+/* Блок одного совпадения */
 #match {
     background-color: #fbfdff;
     border-radius: 10px;
@@ -22,16 +33,19 @@ h1 {
     padding: 10px;
 }
 
+/* Элементы, содержащие часть статьи с искомым словом */
 #url_body {
     font-family: monospace;
 }
 
+/* Подвал страницы */
 footer {
      text-align: right;
      text-size: 10px;
      color: #c0c0c0;
 }
 
+/* искомое слово */
 #word_match {
     color: #F80000;
     font-style: oblique;
@@ -40,7 +54,8 @@ footer {
     font-weight: 900;
 }
 
-#button {
+/* Кнопка отправки формы */
+#button_sub {
     background-color: #e7e7e7;
     color: black;
     border: none;
@@ -55,20 +70,45 @@ footer {
     cursor: pointer;
     width: 100px;
 }
-
-#button:hover {
+/* Кнопка после наведения курсора */
+#button_sub:hover {
     background-color: white;
-    border: 2px solid black;
+    border: 2px solid #e7e7e7;
+}
+/* Убираем обводку при выделении элемента */
+#button_sub:active, #button_sub:focus {
+  outline: none;
+}
+#button_sub::-moz-focus-inner {
+    border: 0;
 }
 
+/* Главное поле ввода */
 #main_input {
     background-color: white;
     font-size: 16px;
     color: black;
     border: none;
     padding: 12px 12px;
-    margin: 0 0px 0 14px;
+    margin: 0 -6px 0 14px;
     border-radius: 6px 0 0 6px;
-    width: 1040px;
+    width: 1044px;
     border: 2px solid white;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
 }
+
+#main_input:hover {
+    background-color: white;
+    border: 2px solid #e7e7e7;
+}
+
+/* Убираем обводку при выделении элемента */
+#main_input:active, #main_input:focus {
+  outline: none;
+}
+#main_input::-moz-focus-inner {
+    border: 0;
+}
+
+
