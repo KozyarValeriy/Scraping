@@ -12,7 +12,7 @@ h1 {
     padding: 10px;
     border-radius: 10px;
     background-color: #c0c0c0;
-    width: 70%;
+    width: 1200px;
     margin:10px auto;
 }
 
@@ -47,8 +47,30 @@ footer {
     background-color: #e7e7e7;
     color: black;
     border: none;
-    padding: 12px 28px;
+    font-size: 16px;
+    padding: 12px 28px 12px 24px;
     text-align: center;
-    border-radius: 8px;
+    border-radius: 0 10px 10px 0;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    border: 2px solid #e7e7e7;
+    cursor: pointer;
+    width: 100px;
+}
 
+#button:hover {
+    background-color: white;
+    border: 2px solid black;
+}
+
+#main_input {
+    background-color: white;
+    font-size: 16px;
+    color: black;
+    border: none;
+    padding: 12px 12px;
+    margin: 0 0px 0 12px;
+    border-radius: 6px 0 0 6px;
+    width: 1045px;
+    border: 2px solid white;
 }

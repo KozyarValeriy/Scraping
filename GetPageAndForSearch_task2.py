@@ -14,13 +14,8 @@ LOCK = Lock()
 NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
 
 
-def save_to_db(conn, url: str, word: str, index: int):
-    # Запускаем в отдельном потоке, поэтому ставим мьютекс
-    if word in ("", " ",):
-        return
-    if (word, url) in ALL_WORDS_AND_LINKS or (word, url) in WORDS_IN_SESSION:
-        return
-    ins = "insert into word_to_url values('{0}', '{1}', {2})".format(word, url, index)
+def save_to_db(conn, url: str, word: str):
+    ins = "insert into word_to_url values('{0}', '{1}')".format(word, url)
     try:
         with conn.cursor() as cursor:
             cursor.execute(ins)
@@ -36,6 +31,7 @@ def main():
     global ALL_WORDS_AND_LINKS
     conn = None
     try:
+        i = 0
         conn = psycopg2.connect(**DB_config)
         with conn.cursor() as cursor:
             cursor.execute("select url, topic from url_to_topic")
@@ -43,14 +39,21 @@ def main():
         with conn.cursor() as cursor:
             cursor.execute("select word, url from word_to_url")
             ALL_WORDS_AND_LINKS = cursor.fetchall()
+        max_ = len(data_to_parse)
         for url, text in data_to_parse:
-            for index, word in enumerate(re.split(r"[\n \r\t]", text.lower())):
-                save_to_db(conn, url, word, index)
+            i += 1
+            for word in set(re.split(r"\W", text.lower())):
+                if word in ("", " "):
+                    continue
+                if (word, url) in ALL_WORDS_AND_LINKS or (word, url) in WORDS_IN_SESSION:
+                    continue
+                save_to_db(conn, url, word)
                 # thread = Thread(target=save_to_db, args=(conn, url, word, index))
                 # thread.setDaemon(True)
                 # thread.start()
                 WORDS_IN_SESSION.append((word, url))
                 # print(word, url)
+            print("{0} from {1} done! url: {2}".format(i, max_, url))
     except Exception as err:
         logging.error(err)
         # if conn is not None:

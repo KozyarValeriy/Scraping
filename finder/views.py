@@ -16,8 +16,6 @@ def main_page():
     if request.method == "POST":
         query = request.form.get("search")
     query = None if query == "" else query
-    # urls = [{"path": r"https://pythonworld.ru/", "body": "bla bla bla"},
-    #         {"path": r"https://yandex.ru/", "body": "bla2 bla2 bla2"}]
     if query is None:
         return render_template("main.html", search_url=URL, result=False)
     else:

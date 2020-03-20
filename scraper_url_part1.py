@@ -15,6 +15,7 @@ LINKS_IN_SESSION = []
 ALL_LINKS = []
 LOCK = Lock()
 NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
+ALL_THREAD = []
 
 
 def save_to_db(conn, url: str, text: str):
@@ -26,8 +27,16 @@ def save_to_db(conn, url: str, text: str):
     """
     # Запускаем в отдельном потоке, поэтому ставим мьютекс
     LOCK.acquire()
+    # заменяем символы одинарных кавычек на двойные
     text = text.strip().replace('\'', '"')
+    # удаляем часть скрипка, который в теле текства
+    text = re.sub(r"\s*window\.dataLayer([^;]*;){4}", "\n", text)
+    text = re.sub(r"\s*try{([^}]*}){3}", "\n", text)
+    text = re.sub(r"\s*\(function([^;]*;){10}", "\n", text)
+    # заменяем повторяющиеся переносы и пробелы на один символ
     text = re.sub(r"\n+", r"\n", text)
+    text = re.sub(r" +", r" ", text).strip()
+    # формируем запрос
     ins = "insert into url_to_topic values('{0}', '{1}', TIMESTAMP '{2}')".format(url, text,
                                                                                   str(datetime.datetime.today()))
     try:
@@ -56,9 +65,11 @@ def get_all_link(conn, url: str):
     soup = BeautifulSoup(page.text, 'lxml')
     # Если страницу по этому url еще нет в БД, то записываем ее в БД
     if url not in ALL_LINKS:
-        thread = Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text()))
-        thread.setDaemon(True)
-        thread.start()
+        ALL_THREAD.append(Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text())))
+        # thread = Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text()))
+        # thread.setDaemon(True)
+        ALL_THREAD[-1].start()
+        # save_to_db(conn, url, soup.find('body').get_text())
     # Добавляем эту ссылку в пройденные в этой сессии
     LINKS_IN_SESSION.append(url)
     # Обходим все теги <a> на странице
@@ -101,6 +112,8 @@ def main():
     finally:
         if conn is not None:
             # conn.commit()
+            for thread in ALL_THREAD:
+                thread.join()
             conn.close()
 
 
