@@ -35,7 +35,6 @@ def get_topics(word: str) -> list:
                     # заменяем все символы переноса строки и табуляции на пробелы
                     text = re.sub(r"[\n \r\t]", r' ', text)
                     # позиция слова в тексте
-                    # pos = text.lower().find(word)
                     match_word = re.search(rf'(?P<start>^|\W+){word}($|\W+)', text.lower())
                     pos = match_word.start() + len(match_word.group('start'))
                     # получаем границы диапазона в зависимости от расположения слова в тексте
@@ -62,7 +61,8 @@ def get_topics(word: str) -> list:
                         body_first = "..." + body_first
                     if stop_step != len(text):
                         body_last = body_last + "..."
-                    result.append({"path": link[0],
+                    path = split_url(link[0])
+                    result.append({"path": path,  # link[0],
                                    "body_first": body_first,
                                    "body_last": body_last,
                                    "word": text[pos: pos + len(word)]})
@@ -75,6 +75,28 @@ def get_topics(word: str) -> list:
     finally:
         if conn is not None:
             conn.close()
+    return result
+
+
+def split_url(url: str) -> list:
+    """ Функция для разбиения ссылки на подссылки
+
+    :param url: ссылка, которую надо разбить на подссылки
+    :return: скписок из кортежей, в котором нулевой элемент - прямя ссылка,
+             а 1 элеметн - конечный элемент для ссылки.
+    """
+    first = []
+    last = []
+    pos_protocol = url.find('//')
+    pos_protocol = 0 if pos_protocol < 0 else pos_protocol + 2
+    count_links = 0
+    for pos in range(pos_protocol, len(url)):
+        if url[pos] == '/':
+            first.append(url[:pos])
+            count_links += 1
+    first.append(url)
+    last = url.rsplit('/', count_links)
+    result = list(zip(first, last))
     return result
 
 

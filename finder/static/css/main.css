@@ -16,6 +16,9 @@ a:hover {
     color: red;
 }
 
+.match_link {
+    color: #070;
+}
 
 .main_content {
     padding: 10px;
@@ -110,5 +113,7 @@ footer {
 #main_input::-moz-focus-inner {
     border: 0;
 }
+
+
 
 
