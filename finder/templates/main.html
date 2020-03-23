@@ -11,13 +11,8 @@
     <div class="main_content">
         <form action="" method="post">
             <p>
-                {% if query %}
-                    <input id="main_input" type="text" name="search" autocomplete="off"
-                       placeholder="Введите слово для поиска" value={{query}}>
-                {% else %}
-                    <input id="main_input" type="text" name="search" autocomplete="off"
-                        placeholder="Введите слово для поиска" value={{query}}>
-                {% endif %}
+                <input id="main_input" type="text" name="search" autocomplete="off"
+                    placeholder="Введите слово для поиска" value={{query}}>
                 <button id="button_sub" type="submit" tabindex="0">Поиск</button>
             </p>
         </form>
@@ -28,7 +23,9 @@
         {% for url in urls %}
             <div id="match">
                 <div><a href={{url.path}} target="_blank">{{url.path}}</a></div>
-                <div id="url_body"><p>{{url.body_first}} <span id='word_match'>{{url.word}}</span> {{url.body_last}}</p></div>
+                <div id="url_body">
+                    <p>{{url.body_first}} <span id='word_match'>{{url.word}}</span> {{url.body_last}}</p>
+                </div>
             </div>
         {% endfor %}
     </div>

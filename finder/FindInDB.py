@@ -35,7 +35,9 @@ def get_topics(word: str) -> list:
                     # заменяем все символы переноса строки и табуляции на пробелы
                     text = re.sub(r"[\n \r\t]", r' ', text)
                     # позиция слова в тексте
-                    pos = text.lower().find(word)
+                    # pos = text.lower().find(word)
+                    match_word = re.search(rf'(?P<start>^|\W+){word}($|\W+)', text.lower())
+                    pos = match_word.start() + len(match_word.group('start'))
                     # получаем границы диапазона в зависимости от расположения слова в тексте
                     if pos < RANGE // 2:
                         # если слово стоит от начала ближе, чем половина диапазона

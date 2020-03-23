@@ -1,3 +1,8 @@
+"""
+    Скрипт первой части паука.
+    Обходит все старницы сайта и сохряняет их в базу данных.
+"""
+
 import datetime
 from threading import Thread, Lock
 import logging
@@ -11,8 +16,8 @@ import requests
 from config import URL, DB_config
 
 
-LINKS_IN_SESSION = []
-ALL_LINKS = []
+LINKS_IN_SESSION = set()
+ALL_LINKS = set()
 LOCK = Lock()
 NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
 ALL_THREAD = []
@@ -42,12 +47,12 @@ def save_to_db(conn, url: str, text: str):
     try:
         with conn.cursor() as cursor:
             cursor.execute(ins)
-        conn.commit()
+        # conn.commit()
         # Добавляем ссылку в скаченные, если не было ошибки
-        ALL_LINKS.append(url)
+        ALL_LINKS.add(url)
     except Exception as err:
         logging.error(err)
-        conn.rollback()
+        # conn.rollback()
     finally:
         LOCK.release()
 
@@ -68,7 +73,7 @@ def get_all_link(conn, url: str):
         ALL_THREAD.append(Thread(target=save_to_db, args=(conn, url, soup.find('body').get_text())))
         ALL_THREAD[-1].start()
     # Добавляем эту ссылку в пройденные в этой сессии
-    LINKS_IN_SESSION.append(url)
+    LINKS_IN_SESSION.add(url)
     # Обходим все теги <a> на странице
     for link in set(soup.findAll("a")):
         try:
@@ -88,14 +93,19 @@ def get_all_link(conn, url: str):
 
 
 def main():
+    """ Функция начала обхода.
+        Устанавливет соединение с БД и запускает рекурсивную функцию обхода сайта.
+    """
     global ALL_LINKS
     conn = None
     try:
         conn = psycopg2.connect(**DB_config)
+        # Запрос к БД, чтобы узнать, какие страницы уже сохранены сейчас
         with conn.cursor() as cursor:
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
-        ALL_LINKS = list(link[0] for link in links)
+        # сохраняем во множество, так как поиск по множеству - O(1)
+        ALL_LINKS = set(link[0] for link in links)
         get_all_link(conn, URL)
     except Exception as err:
         logging.error(err)
@@ -103,6 +113,7 @@ def main():
         if conn is not None:
             for thread in ALL_THREAD:
                 thread.join()
+            conn.commit()
             conn.close()
 
 

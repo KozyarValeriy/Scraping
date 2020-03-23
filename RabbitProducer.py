@@ -1,3 +1,8 @@
+"""
+    Продьюсер для RabbitMG.
+    Обходит все страницы сайта, собирает и передает ссылки в очередь.
+"""
+
 import logging
 import time
 
@@ -9,8 +14,8 @@ import pika
 from config import URL, DB_config
 
 
-LINKS_IN_SESSION = []
-ALL_LINKS = []
+LINKS_IN_SESSION = set()
+ALL_LINKS = set()
 NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
 
 
@@ -25,7 +30,7 @@ def get_all_links(channel, url: str):
         return
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'lxml')
-    # Если страницу по этому url еще нет в БД, то записываем ее в БД
+    # Если страницу по этому url еще нет в БД, то тправляем в очередь
     if url not in ALL_LINKS:
         print(url)
         channel.basic_publish(exchange='',
@@ -35,7 +40,7 @@ def get_all_links(channel, url: str):
                               ),
                               body=url)
     # Добавляем эту ссылку в пройденные в этой сессии
-    LINKS_IN_SESSION.append(url)
+    LINKS_IN_SESSION.add(url)
     # Обходим все теги <a> на странице
     for link in set(soup.findAll("a")):
         try:
@@ -55,6 +60,9 @@ def get_all_links(channel, url: str):
 
 
 def main():
+    """ Функция начала обхода.
+        Устанавливет соединение с БД и запускает рекурсивную функцию обхода сайта.
+    """
     global ALL_LINKS
     conn_DB = None
     conn_rabbit = None
@@ -63,7 +71,8 @@ def main():
         with conn_DB.cursor() as cursor:
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
-        ALL_LINKS = list(link[0] for link in links)
+        # сохраняем во множество, так как поиск по множеству - O(1)
+        ALL_LINKS = set(link[0] for link in links)
         # Создание очереди
         conn_rabbit = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
         channel = conn_rabbit.channel()

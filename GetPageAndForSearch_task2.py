@@ -1,62 +1,66 @@
-from threading import Thread, Lock
+"""
+    Скрипт второй части паука.
+    Обходим все скаченные статьи и строим обратный индекс: слово -> сылка на статью.
+    Так как страницы уже скачены, то запросы снова делать не нужно.
+"""
+
 import logging
 import time
 import re
 
 import psycopg2
 
-from config import URL, DB_config
+from config import DB_config
 
 
-WORDS_IN_SESSION = []
-ALL_WORDS_AND_LINKS = []
-LOCK = Lock()
 NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
+ALL_WORDS_AND_LINKS = None
 
 
 def save_to_db(conn, url: str, word: str):
+    """ Функция для сохранения в БД """
     ins = "insert into word_to_url values('{0}', '{1}')".format(word, url)
     try:
         with conn.cursor() as cursor:
             cursor.execute(ins)
-        conn.commit()
-        # print(word, url)
     except Exception as err:
         logging.error(err)
-        conn.rollback()
         print(err)
 
 
 def main():
+    """ Функция обхода статей по словам. """
     global ALL_WORDS_AND_LINKS
     conn = None
     try:
         i = 0
         conn = psycopg2.connect(**DB_config)
+        # Получаем все статьи, которые есть на текущий момент в БД
         with conn.cursor() as cursor:
             cursor.execute("select url, topic from url_to_topic")
             data_to_parse = cursor.fetchall()
+        # Получаем все уже записанные слова в БД, чтобы не писать их еще раз
         with conn.cursor() as cursor:
             cursor.execute("select word, url from word_to_url")
-            ALL_WORDS_AND_LINKS = cursor.fetchall()
-        max_ = len(data_to_parse)
+            # сохраняем во множество, так как поиск по множеству - O(1)
+            ALL_WORDS_AND_LINKS = set(cursor.fetchall())
+        max_ = len(data_to_parse)  # кол-во всех ссылок. Для дебага
         for url, text in data_to_parse:
-            i += 1
+            i += 1  # Для дебага
+            # Разбиваем статью на слова
             for word in set(re.split(r"\W", text.lower())):
                 if word in ("", " "):
                     continue
-                if (word, url) in ALL_WORDS_AND_LINKS or (word, url) in WORDS_IN_SESSION:
+                if (word, url) in ALL_WORDS_AND_LINKS:
                     continue
                 save_to_db(conn, url, word)
-                # thread = Thread(target=save_to_db, args=(conn, url, word, index))
-                # thread.setDaemon(True)
-                # thread.start()
-                WORDS_IN_SESSION.append((word, url))
-            print("{0} from {1} done! url: {2}".format(i, max_, url))
+                ALL_WORDS_AND_LINKS.add((word, url))
+            print("{0} from {1} done! url: {2}".format(i, max_, url))  # Для дебага
     except Exception as err:
         logging.error(err)
     finally:
         if conn is not None:
+            conn.commit()
             conn.close()
 
 

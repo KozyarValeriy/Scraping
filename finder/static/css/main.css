@@ -19,7 +19,7 @@ a:hover {
 
 .main_content {
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 6px;
     background-color: #c0c0c0;
     width: 1200px;
     margin: 10px auto;
@@ -28,7 +28,7 @@ a:hover {
 /* Блок одного совпадения */
 #match {
     background-color: #fbfdff;
-    border-radius: 10px;
+    border-radius: 4px;
     margin: 10px;
     padding: 10px;
 }
@@ -63,9 +63,9 @@ footer {
     padding: 12px 28px 12px 24px;
     margin: 0;
     text-align: center;
-    border-radius: 0 10px 10px 0;
-    -webkit-transition-duration: 0.4s;
-    transition-duration: 0.4s;
+    border-radius: 0 4px 4px 0;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
     border: 2px solid #e7e7e7;
     cursor: pointer;
     width: 100px;
@@ -91,11 +91,11 @@ footer {
     border: none;
     padding: 12px 12px;
     margin: 0 -6px 0 14px;
-    border-radius: 6px 0 0 6px;
+    border-radius: 4px 0 0 4px;
     width: 1044px;
     border: 2px solid white;
-    -webkit-transition-duration: 0.4s;
-    transition-duration: 0.4s;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
 }
 
 #main_input:hover {
