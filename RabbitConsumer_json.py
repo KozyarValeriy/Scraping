@@ -6,10 +6,9 @@
 
 import logging
 import re
+import json
 
 import psycopg2
-from bs4 import BeautifulSoup
-import requests
 import pika
 
 from config import DB_config
@@ -79,33 +78,25 @@ def main():
 def handing_message(ch, method, properties, body: bytes):
     """ Функция для обработки одонго сообщения из очереди """
     # преобразование в строку
-    url = body.decode()
-    print(url)
+    data = json.loads(body)
+    print(data["url"])
     # Записываем только те ссылки, которых еще нет в БД
-    if url not in ALL_LINKS:
-        page = requests.get(body)
-        soup = BeautifulSoup(page.text, 'lxml')
-        text = " ".join([s for s in soup.strings if s.parent.name not in INVISIBLE_ELEMENTS])
-        # замена одинарных кавычек
-        text = text.strip().replace('\'', '"')
-        # заменяем повторяющиеся переносы и пробелы на один символ
-        text = re.sub(r"\n+", r"\n", text)
-        text = re.sub(r" +", r" ", text).strip()
+    if data["url"] not in ALL_LINKS:
         # запрос на вставку
-        insert = "insert into url_to_topic values('{0}', '{1}')".format(url, text)
+        insert = "insert into url_to_topic values('{0}', '{1}')".format(data["url"], data["body"])
         res = save_to_db(insert)
         if res:
-            ALL_LINKS.add(url)
+            ALL_LINKS.add(data["url"])
         # для всех слов в тексте
-        for word in set(re.split(r"\W", text.lower())):
+        for word in set(re.split(r"\W", data["body"].lower())):
             if word in ("", " "):
                 continue
-            if (word, url) in ALL_WORDS_AND_LINKS:
+            if (word, data["url"]) in ALL_WORDS_AND_LINKS:
                 continue
-            insert = "insert into word_to_url values('{0}', '{1}')".format(word, url)
+            insert = "insert into word_to_url values('{0}', '{1}')".format(word, data["url"])
             res = save_to_db(insert)
             if res:
-                ALL_WORDS_AND_LINKS.add((word, url))
+                ALL_WORDS_AND_LINKS.add((word, data["url"]))
         conn_DB.commit()
     ch.basic_ack(delivery_tag=method.delivery_tag)
 

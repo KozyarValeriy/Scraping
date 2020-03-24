@@ -25,6 +25,7 @@
                 <div>
                     {% for link in url.path %}
                         {% if loop.first %}
+
                             <b><a class='match_link' href={{link[0]}} target="_blank">{{link[1]}}</a></b>
                         {% else %}
                             <a class='match_link' href={{link[0]}} target="_blank">{{link[1]}}</a>

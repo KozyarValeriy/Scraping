@@ -21,6 +21,8 @@ class Collector:
     """ Класс для сбора всех страниц с сайта """
     # форматы, не являющиеся страницами
     NOT_PAGE = (".png", ".pdf", ".jpeg", ".bmp")
+    # Невидимые элементы
+    INVISIBLE_ELEMENTS = ('style', 'script', 'head', 'title')
 
     def __init__(self, url: str, db_config: dict, topic_table: str, word_table: str):
         """ Инициализация экземпляра класса
@@ -83,7 +85,8 @@ class Collector:
         soup = BeautifulSoup(page.text, 'lxml')
         # Если страницу по этому url еще нет в БД, то записываем ее в БД
         if url not in self._all_links:
-            self._all_thread.append(Thread(target=self._prepare_text, args=(url, soup.find('body').get_text())))
+            text = ' '.join([s for s in soup.strings if s.parent.name not in self.INVISIBLE_ELEMENTS])
+            self._all_thread.append(Thread(target=self._prepare_text, args=(url, text)))
             self._all_thread[-1].start()
         # Добавляем эту ссылку в пройденные в этой сессии
         self._links_in_session.add(url)
@@ -111,10 +114,6 @@ class Collector:
         """
         # подготовка текста для записи в БД
         text = text.strip().replace('\'', '"')
-        # удаляем часть скрипка, который в теле текства
-        text = re.sub(r"\s*window\.dataLayer([^;]*;){4}", "\n", text)
-        text = re.sub(r"\s*try{([^}]*}){3}", "\n", text)
-        text = re.sub(r"\s*\(function([^;]*;){10}", "\n", text)
         # заменяем повторяющиеся переносы и пробелы на один символ
         text = re.sub(r"\n+", r"\n", text)
         text = re.sub(r" +", r" ", text).strip()
@@ -130,7 +129,7 @@ class Collector:
             self.save_to_db(command)
             self._all_links.add(url)
             # бходим все слова для построения обратного индекса
-            for word in set(re.split(r"\W", text)):
+            for word in set(re.split(r"\W", text.lower())):
                 if word in ("", " "):
                     continue
                 if (word, url) in self._all_words_and_links:
