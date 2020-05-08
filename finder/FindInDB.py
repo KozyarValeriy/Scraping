@@ -86,7 +86,6 @@ def split_url(url: str) -> list:
              а 1 элеметн - конечный элемент для ссылки.
     """
     first = []
-    last = []
     pos_protocol = url.find('//')
     pos_protocol = 0 if pos_protocol < 0 else pos_protocol + 2
     count_links = 0

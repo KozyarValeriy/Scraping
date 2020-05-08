@@ -1,4 +1,5 @@
-body {
+html, body{
+    height: 98%;
     font-family: Verdana,sans-serif;
 }
 
@@ -20,16 +21,22 @@ a:hover {
     color: #070;
 }
 
-.main_content {
+.main_content, .result_content {
     padding: 10px;
     border-radius: 6px;
     background-color: #c0c0c0;
     width: 1200px;
     margin: 10px auto;
+    box-shadow: 0px 0px 1px 1px #000000;
+}
+
+.result_content {
+    height: 75%;
+    overflow: auto;
 }
 
 /* Блок одного совпадения */
-#match {
+.match {
     background-color: #fbfdff;
     border-radius: 4px;
     margin: 10px;
@@ -37,12 +44,15 @@ a:hover {
 }
 
 /* Элементы, содержащие часть статьи с искомым словом */
-#url_body {
+.url_body {
     font-family: monospace;
 }
 
 /* Подвал страницы */
 footer {
+     position: fixed;
+     bottom: 10px;
+     right: 40px;
      text-align: right;
      text-size: 10px;
      color: #c0c0c0;

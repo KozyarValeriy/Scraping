@@ -64,11 +64,11 @@ def main():
         Устанавливет соединение с БД и запускает рекурсивную функцию обхода сайта.
     """
     global ALL_LINKS
-    conn_DB = None
+    conn_db = None
     conn_rabbit = None
     try:
-        conn_DB = psycopg2.connect(**DB_config)
-        with conn_DB.cursor() as cursor:
+        conn_db = psycopg2.connect(**DB_config)
+        with conn_db.cursor() as cursor:
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
         # сохраняем во множество, так как поиск по множеству - O(1)
@@ -82,8 +82,8 @@ def main():
     except Exception as err:
         logging.error(err)
     finally:
-        if conn_DB is not None:
-            conn_DB.close()
+        if conn_db is not None:
+            conn_db.close()
         if conn_rabbit is not None:
             conn_rabbit.close()
 

@@ -18,14 +18,14 @@
         </form>
     </div>
     {% if result %}
-    <div class="main_content">
+    <div class="result_content">
         <h3 style="margin: 10px;">Результаты поиска "{{query}}" (всего совпадений: {{count}}):</h3>
+
         {% for url in urls %}
-            <div id="match">
+            <div class="match">
                 <div>
                     {% for link in url.path %}
                         {% if loop.first %}
-
                             <b><a class='match_link' href={{link[0]}} target="_blank">{{link[1]}}</a></b>
                         {% else %}
                             <a class='match_link' href={{link[0]}} target="_blank">{{link[1]}}</a>
@@ -35,7 +35,7 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="url_body">
+                <div class="url_body">
                     <p>{{url.body_first}} <span id='word_match'>{{url.word}}</span> {{url.body_last}}</p>
                 </div>
             </div>

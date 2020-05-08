@@ -20,7 +20,7 @@ WORDS_IN_SESSION = set()
 ALL_WORDS_AND_LINKS = set()
 # Невидимые элементы
 INVISIBLE_ELEMENTS = ('style', 'script', 'head', 'title')
-conn_DB = None
+conn_db = None
 
 
 def save_to_db(action: str) -> bool:
@@ -30,7 +30,7 @@ def save_to_db(action: str) -> bool:
     :return: результат выполнения.
     """
     try:
-        with conn_DB.cursor() as cursor:
+        with conn_db.cursor() as cursor:
             cursor.execute(action)
         return True
     except Exception as err:
@@ -43,18 +43,18 @@ def main():
         Инициализирует подключение к БД и очереди.
         Опрашивает очередь и записывает полученные статьи в БД.
     """
-    global ALL_LINKS, conn_DB, ALL_WORDS_AND_LINKS
+    global ALL_LINKS, conn_db, ALL_WORDS_AND_LINKS
     conn_rabbit = None
     try:
-        conn_DB = psycopg2.connect(**DB_config)
+        conn_db = psycopg2.connect(**DB_config)
         # Получаем все статьи, которые есть на текущий момент в БД
-        with conn_DB.cursor() as cursor:
+        with conn_db.cursor() as cursor:
             cursor.execute("select url from url_to_topic")
             links = cursor.fetchall()
             # сохраняем во множество, так как поиск по множеству - O(1)
             ALL_LINKS = set(link[0] for link in links)
         # Получаем все уже записанные слова в БД, чтобы не писать их еще раз
-        with conn_DB.cursor() as cursor:
+        with conn_db.cursor() as cursor:
             cursor.execute("select word, url from word_to_url")
             ALL_WORDS_AND_LINKS = set(cursor.fetchall())
         # Создание очереди
@@ -69,8 +69,8 @@ def main():
     except Exception as err:
         logging.error(err)
     finally:
-        if conn_DB is not None:
-            conn_DB.close()
+        if conn_db is not None:
+            conn_db.close()
         if conn_rabbit is not None:
             conn_rabbit.close()
 
@@ -97,7 +97,7 @@ def handing_message(ch, method, properties, body: bytes):
             res = save_to_db(insert)
             if res:
                 ALL_WORDS_AND_LINKS.add((word, data["url"]))
-        conn_DB.commit()
+        conn_db.commit()
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 

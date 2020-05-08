@@ -3,7 +3,6 @@
     Обходит все старницы сайта и сохряняет их в базу данных.
 """
 
-import datetime
 from threading import Thread, Lock
 import logging
 import time
@@ -77,6 +76,7 @@ def get_all_link(conn, url: str):
             text_link = str(link["href"])
             # Если это не ссылка на этот же сайт или это не страница, то пропускаем
             if not text_link.startswith(('/', URL)) or text_link.endswith(NOT_PAGE):
+                print(text_link)
                 continue
             # Для относительных ссылок добавляем в начало главный url
             text_link = text_link if text_link.startswith(URL) else "".join([URL, text_link])
